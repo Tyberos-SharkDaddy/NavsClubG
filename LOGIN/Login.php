@@ -40,7 +40,7 @@
             margin-top: 10px;
         }
 
-        input, select {
+        input {
             width: 100%;
             padding: 10px;
             margin-top: 5px;
@@ -48,29 +48,9 @@
             border-radius: 5px;
         }
 
-        input:focus, select:focus {
+        input:focus {
             border-color: #007bff;
             outline: none;
-        }
-
-        .row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .row input {
-            flex: 1;
-        }
-
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            margin-top: 10px;
-        }
-
-        .checkbox-container input {
-            width: auto;
-            margin-right: 10px;
         }
 
         .btn {
@@ -93,30 +73,19 @@
 
 <div class="container">
     <h3>Login</h3>
-    <form id="signupForm">
+    <form action="Sign-in.php" method="POST">
         <!-- Email -->
         <label for="email">Email Address</label>
-        <input type="email" id="email" placeholder="Enter your email" required>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
 
-        <!-- Confirm Email -->
-        <label for="Password">Password</label>
-        <input type="email" id="Password" placeholder="Enter Password" required>
-       <!-- Submit Button -->
-        <button type="submit" class="btn">Sign Up</button>
+        <!-- Password -->
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter Password" required>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn">Login</button>
     </form>
 </div>
-
-<script>
-    document.getElementById("signupForm").addEventListener("submit", function(event) {
-        const email = document.getElementById("email").value;
-        const confirmEmail = document.getElementById("confirm_email").value;
-
-        if (email !== confirmEmail) {
-            alert("Emails do not match!");
-            event.preventDefault();
-        }
-    });
-</script>
 
 </body>
 </html>

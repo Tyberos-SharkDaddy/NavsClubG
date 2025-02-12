@@ -58,7 +58,7 @@
             gap: 10px;
         }
 
-        .row input {
+        .row div {
             flex: 1;
         }
 
@@ -87,40 +87,45 @@
         .btn:hover {
             background: #0056b3;
         }
+
+        .message {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: red;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h3>Sign Up</h3>
-    <form id="signupForm">
-        <!-- Email -->
-        <label for="email">Email Address</label>
-        <input type="email" id="email" placeholder="Enter your email" required>
+    <form action="RegisterNew.php" method="POST">
+    <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
 
-        <!-- Confirm Email -->
-        <label for="confirm_email">Confirm Email</label>
-        <input type="email" id="confirm_email" placeholder="Confirm your email" required>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Password" required>
 
-        <!-- First & Last Name -->
+        <label for="confirm_password">Confirm Password</label>
+        <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
+
         <div class="row">
             <div>
                 <label for="first_name">First Name</label>
-                <input type="text" id="first_name" placeholder="First Name" required>
+                <input type="text" id="first_name" name="first_name" placeholder="First Name" required>
             </div>
             <div>
                 <label for="last_name">Last Name</label>
-                <input type="text" id="last_name" placeholder="Last Name" required>
+                <input type="text" id="last_name" name="last_name" placeholder="Last Name" required>
             </div>
         </div>
 
-        <!-- Nickname -->
         <label for="nickname">Nickname</label>
-        <input type="text" id="nickname" placeholder="Enter your nickname">
+        <input type="text" id="nickname" name="nickname" placeholder="Enter your nickname">
 
-        <!-- Current Rank -->
         <label for="rank">What is your current rank?</label>
-        <select id="rank" required>
+        <select id="rank" name="rank" required>
             <option value="" disabled selected>Select your rank</option>
             <option value="Beginner">Beginner</option>
             <option value="Intermediate">Intermediate</option>
@@ -128,26 +133,32 @@
             <option value="Expert">Expert</option>
         </select>
 
-        <!-- Status -->
         <div class="checkbox-container">
-            <input type="checkbox" id="status" required>
-            <label for="status">✅ I confirm that my information is correct</label>
+            <input type="checkbox" id="confirmed" name="confirmed" required>
+            <label for="confirmed">✅ I confirm that my information is correct</label>
         </div>
 
-        <!-- Submit Button -->
         <button type="submit" class="btn">Sign Up</button>
     </form>
+
+    <div class="message" id="message"></div>
 </div>
 
 <script>
     document.getElementById("signupForm").addEventListener("submit", function(event) {
-        const email = document.getElementById("email").value;
-        const confirmEmail = document.getElementById("confirm_email").value;
+        event.preventDefault(); // Prevent normal form submission
 
-        if (email !== confirmEmail) {
-            alert("Emails do not match!");
-            event.preventDefault();
-        }
+        const formData = new FormData(this);
+
+        fetch("signup.php", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("message").textContent = data;
+        })
+        .catch(error => console.error("Error:", error));
     });
 </script>
 

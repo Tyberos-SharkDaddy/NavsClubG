@@ -113,6 +113,7 @@
     <table>
         <thead>
             <tr>
+                <th>Course ID</th>
                 <th>Course Name</th>        <!-- Name of the course -->
                 <th>About Course</th>       <!-- Brief description of the course -->
                 <th>Audience</th>           <!-- Target audience -->
@@ -311,20 +312,25 @@ document.addEventListener('click', function(e) {
         xhr.onload = function() {
             if (this.status == 200) {
                 const data = JSON.parse(this.responseText);
-                document.getElementById('editCourseID').value = data.CourseID;
-                document.getElementById('editCourseName').value = data.courseName;
-                document.getElementById('editAboutCourse').value = data.aboutCourse;
-                document.getElementById('editAudience').value = data.audience;
-                document.getElementById('editCourseLevel').value = data.courseLevel;
-                document.getElementById('editDuration').value = data.duration;
-                document.getElementById('editCourseBy').value = data.courseBy;
-                document.getElementById('editModal').style.display = 'block';
+                if (data.error) {
+                    alert(data.error); // Display error if course is not found
+                } else {
+                    document.getElementById('editCourseID').value = data.CourseID;
+                    document.getElementById('editCourseName').value = data.CourseName;
+                    document.getElementById('editAboutCourse').value = data.AboutCourse;
+                    document.getElementById('editAudience').value = data.Audience;
+                    document.getElementById('editCourseLevel').value = data.CourseLevel;
+                    document.getElementById('editDuration').value = data.Duration;
+                    document.getElementById('editCourseBy').value = data.CourseBy;
+                    document.getElementById('editModal').style.display = 'block';
+                }
             }
-        }
+        };
         xhr.send();
     }
 });
 
+// Handle Edit Form Submission
 document.getElementById('editForm').onsubmit = function(e) {
     e.preventDefault();
     const formData = new FormData(this);
@@ -332,35 +338,45 @@ document.getElementById('editForm').onsubmit = function(e) {
     xhr.open('POST', 'Courses.php?action=edit', true);
     xhr.onload = function() {
         if (this.status == 200) {
-            loadInventory();
-            document.getElementById('editModal').style.display = 'none';
+            if (this.responseText.trim() === "success") {
+                alert("Course successfully updated!"); // Show success message
+                document.getElementById('editModal').style.display = 'none';
+                loadInventory(); // Refresh the course list
+            } else {
+                alert("Error: " + this.responseText); // Show error message
+            }
         }
-    }
+    };
     xhr.send(formData);
-}
+};
 
 // Delete Course
 document.addEventListener('click', function(e) {
     if (e.target.classList.contains('delete-btn')) {
         const courseID = e.target.getAttribute('data-id');
-        document.getElementById('deleteCourseID').value = courseID;
-        document.getElementById('deleteModal').style.display = 'block';
+
+        if (confirm("Are you sure you want to delete this course?")) {
+            const formData = new FormData();
+            formData.append('action', 'delete');
+            formData.append('courseID', courseID);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'Courses.php', true);
+            xhr.onload = function() {
+                if (this.status == 200) {
+                    if (this.responseText.trim() === "success") {
+                        alert("Course deleted successfully!");
+                        loadInventory(); // Refresh the list
+                    } else {
+                        alert("Error: " + this.responseText);
+                    }
+                }
+            };
+            xhr.send(formData);
+        }
     }
 });
 
-document.getElementById('deleteForm').onsubmit = function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'Courses.php?action=delete', true);
-    xhr.onload = function() {
-        if (this.status == 200) {
-            loadInventory();
-            document.getElementById('deleteModal').style.display = 'none';
-        }
-    }
-    xhr.send(formData);
-}
 
 // View Course
 document.addEventListener('click', function(e) {

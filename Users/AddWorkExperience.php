@@ -21,14 +21,27 @@
                     <input type="text" name="company[]" class="form-control" placeholder="Company" required>
                 </div>
                 <div class="col-md-2">
-                    <input type="date" name="work_date[]" class="form-control" required>
+                    <select name="work_month[]" class="form-control" required>
+                        <option value="" disabled selected>Month</option>
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
                 </div>
                 <div class="col-md-1">
-                    <input type="text" name="work_day[]" class="form-control" placeholder="Day" required>
+                    <input type="number" name="work_day[]" class="form-control" placeholder="Day" required min="1" max="31">
                 </div>
-
                 <div class="col-md-1">
-                    <input type="number" name="work_year[]" class="form-control" placeholder="Year" required>
+                    <input type="number" name="work_year[]" class="form-control" placeholder="Year" required min="1900" max="2099">
                 </div>
                 <div class="col-md-1">
                     <button type="button" class="btn btn-danger remove-field">X</button>
@@ -54,16 +67,27 @@ $(document).ready(function () {
                     <input type="text" name="company[]" class="form-control" placeholder="Company" required>
                 </div>
                 <div class="col-md-2">
-                    <input type="date" name="work_date[]" class="form-control" required>
+                    <select name="work_month[]" class="form-control" required>
+                        <option value="" disabled selected>Month</option>
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August">August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
                 </div>
                 <div class="col-md-1">
-                    <input type="text" name="work_day[]" class="form-control" placeholder="Day" required>
-                </div>
-                <div class="col-md-2">
-                    <input type="text" name="work_month[]" class="form-control" placeholder="Month" required>
+                    <input type="number" name="work_day[]" class="form-control" placeholder="Day" required min="1" max="31">
                 </div>
                 <div class="col-md-1">
-                    <input type="number" name="work_year[]" class="form-control" placeholder="Year" required>
+                    <input type="number" name="work_year[]" class="form-control" placeholder="Year" required min="1900" max="2099">
                 </div>
                 <div class="col-md-1">
                     <button type="button" class="btn btn-danger remove-field">X</button>
@@ -82,7 +106,7 @@ $(document).ready(function () {
         e.preventDefault();
 
         $.ajax({
-            url: "save_work_experience.php",
+            url: "Save-me-up.php",
             type: "POST",
             data: $(this).serialize(),
             success: function (response) {

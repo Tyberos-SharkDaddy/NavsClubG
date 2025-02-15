@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "navsclub"; // Make sure this is the correct database name
+$dbname = "navsclub"; // Ensure this database exists
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -17,18 +17,18 @@ $action = isset($_GET['action']) ? $_GET['action'] : (isset($_POST['action']) ? 
 
 // List all courses
 if ($action == 'list') {
-    $sql = "SELECT * FROM courses"; // Adjusted table name and fields
+    $sql = "SELECT * FROM courses";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
+        while ($row = $result->fetch_assoc()) {
             echo "<tr>
                     <td>{$row['CourseID']}</td>
                     <td>{$row['CourseName']}</td>
                     <td>{$row['CourseLevel']}</td>
                     <td>{$row['AboutCourse']}</td>
                     <td>{$row['Audience']}</td>
-                    <td>{$row['Duration']}</td>                    
+                    <td>{$row['Duration']}</td>
                     <td>{$row['CourseBy']}</td>
                     <td>
                         <button class='view-btn' data-id='{$row['CourseID']}'>View</button>
@@ -38,13 +38,12 @@ if ($action == 'list') {
                 </tr>";
         }
     } else {
-        echo "<tr><td colspan='7'>No records found</td></tr>";
+        echo "<tr><td colspan='8'>No records found</td></tr>";
     }
 }
 
 // Add a new course
 if ($action == 'add') {
-    // Validate inputs
     if(isset($_POST['courseName'], $_POST['aboutCourse'], $_POST['audience'], $_POST['courseLevel'], $_POST['duration'], $_POST['courseBy'])){
         $courseName = $_POST['courseName'];
         $aboutCourse = $_POST['aboutCourse'];
@@ -53,12 +52,11 @@ if ($action == 'add') {
         $duration = $_POST['duration'];
         $courseBy = $_POST['courseBy'];
 
-        // Prepared statement to insert new course
-        $stmt = $conn->prepare("INSERT INTO courses (courseName, aboutCourse, audience, courseLevel, duration, courseBy) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO courses (CourseName, AboutCourse, Audience, CourseLevel, Duration, CourseBy) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("ssssss", $courseName, $aboutCourse, $audience, $courseLevel, $duration, $courseBy);
 
         if ($stmt->execute()) {
-            echo "New record created successfully";
+            echo "success";
         } else {
             echo "Error: " . $stmt->error;
         }
@@ -70,7 +68,6 @@ if ($action == 'add') {
 
 // Edit an existing course
 if ($action == 'edit') {
-    // Validate inputs
     if(isset($_POST['courseID'], $_POST['courseName'], $_POST['aboutCourse'], $_POST['audience'], $_POST['courseLevel'], $_POST['duration'], $_POST['courseBy'])){
         $courseID = $_POST['courseID'];
         $courseName = $_POST['courseName'];
@@ -80,12 +77,11 @@ if ($action == 'edit') {
         $duration = $_POST['duration'];
         $courseBy = $_POST['courseBy'];
 
-        // Prepared statement to update course
-        $stmt = $conn->prepare("UPDATE courses SET courseName=?, aboutCourse=?, audience=?, courseLevel=?, duration=?, courseBy=? WHERE courseID=?");
+        $stmt = $conn->prepare("UPDATE courses SET CourseName=?, AboutCourse=?, Audience=?, CourseLevel=?, Duration=?, CourseBy=? WHERE CourseID=?");
         $stmt->bind_param("ssssssi", $courseName, $aboutCourse, $audience, $courseLevel, $duration, $courseBy, $courseID);
 
         if ($stmt->execute()) {
-            echo "Record updated successfully";
+            echo "success";
         } else {
             echo "Error: " . $stmt->error;
         }
@@ -97,16 +93,14 @@ if ($action == 'edit') {
 
 // Delete a course
 if ($action == 'delete') {
-    // Validate courseID
     if(isset($_POST['courseID'])){
         $courseID = $_POST['courseID'];
 
-        // Prepared statement to delete course
-        $stmt = $conn->prepare("DELETE FROM courses WHERE courseID=?");
+        $stmt = $conn->prepare("DELETE FROM courses WHERE CourseID=?");
         $stmt->bind_param("i", $courseID);
 
         if ($stmt->execute()) {
-            echo "Record deleted successfully";
+            echo "success";
         } else {
             echo "Error: " . $stmt->error;
         }

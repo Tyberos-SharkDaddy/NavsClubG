@@ -42,12 +42,41 @@
                     <td><?php echo $file['name']; ?></td>
                     <td><?php echo number_format($file['size'] / 1024, 2); ?></td>
                     <td>
-                        <a href="index.php?file_id=<?php echo $file['id']; ?>" class="btn btn-success btn-sm">Download</a>
+                    <button class="btn btn-danger btn-sm delete-btn" data-id="<?php echo $file['id']; ?>">Delete</button>
                     </td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
     </div>
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".delete-btn").forEach(button => {
+        button.addEventListener("click", function() {
+            const fileId = this.getAttribute("data-id");
+
+            if (confirm("Are you sure you want to delete this file?")) {
+                fetch("deleteFile.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: "delete_id=" + fileId
+                })
+                .then(response => response.text())
+                .then(data => {
+                    if (data.trim() === "success") {
+                        alert("File deleted successfully!");
+                        this.closest("tr").remove(); // Remove the file row from table
+                    } else {
+                        alert("Error deleting file!");
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            }
+        });
+    });
+});
+</script>
+
+
 </body>
 </html>

@@ -28,8 +28,8 @@
           <td><?php echo $file['downloads']; ?></td>
           <td>
             <a href="download_file.php?file_id=<?php echo $file['id']; ?>" class="btn btn-success btn-sm">Download</a>
-            <button class="btn btn-primary btn-sm view-file" data-file="<?php echo $file['name']; ?>">View</button>
-          </td>
+            <button class="btn btn-primary btn-sm view-file" data-id="<?php echo $file['id']; ?>">View</button>
+            </td>
         </tr>
     <?php endforeach; ?>
     </tbody>
@@ -55,29 +55,49 @@
 <script>
 $(document).ready(function() {
     $(".view-file").click(function() {
-        let fileName = $(this).data("file");
-        let fileExt = fileName.split('.').pop().toLowerCase();
-        let filePath = "uploads/" + fileName;
-        let previewHTML = "";
+        let fileId = $(this).attr("data-id"); // Fetch file ID from button
 
-        if (["jpg", "jpeg", "png", "gif"].includes(fileExt)) {
-            previewHTML = `<img src="${filePath}" class="img-fluid" alt="Image Preview">`;
-        } else if (fileExt === "pdf") {
-            previewHTML = `<iframe src="${filePath}" width="100%" height="500px"></iframe>`;
-        } else if (fileExt === "txt") {
-            $.get(filePath, function(data) {
-                previewHTML = `<pre>${data}</pre>`;
-                $("#filePreview").html(previewHTML);
-            });
+        if (!fileId) {
+            alert("Invalid file ID!");
             return;
-        } else {
-            previewHTML = `<p class="text-danger">Unsupported file format</p>`;
         }
 
-        $("#filePreview").html(previewHTML);
-        $("#fileModal").modal("show");
+        $.ajax({
+            url: "fetch_file.php",
+            type: "POST",
+            data: { file_id: fileId },
+            dataType: "json",
+            success: function(response) {
+                if (response.success) {
+                    let fileExt = response.file_name.split('.').pop().toLowerCase();
+                    let previewHTML = "";
+
+                    if (["jpg", "jpeg", "png", "gif"].includes(fileExt)) {
+                        previewHTML = `<img src="data:${response.file_type};base64,${response.file_data}" class="img-fluid" alt="Image Preview">`;
+                    } else if (fileExt === "pdf") {
+                        previewHTML = `<iframe src="data:${response.file_type};base64,${response.file_data}" width="100%" height="500px"></iframe>`;
+                    } else if (fileExt === "docx") {
+                        previewHTML = `<iframe src="https://docs.google.com/gview?url=data:${response.file_type};base64,${response.file_data}&embedded=true" width="100%" height="500px"></iframe>`;
+                    } else if (fileExt === "txt") {
+                        previewHTML = `<pre>${atob(response.file_data)}</pre>`;
+                    } else {
+                        previewHTML = `<p class="text-danger">Unsupported file format</p>`;
+                    }
+
+                    $("#filePreview").html(previewHTML);
+                    $("#fileModal").modal("show");
+                } else {
+                    alert(response.error);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr.responseText);
+                alert("Error loading file.");
+            }
+        });
     });
 });
+
 </script>
 
 </body>

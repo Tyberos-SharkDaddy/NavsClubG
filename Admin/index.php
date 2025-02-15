@@ -74,7 +74,7 @@ mysqli_close($conn);
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-   $(document).ready(function() {
+  $(document).ready(function() {
     function handleUpload(form, inputSelector) {
         $(form).on("submit", function(e) {
             e.preventDefault();
@@ -82,7 +82,7 @@ mysqli_close($conn);
             let formData = new FormData(this);
             let files = $(inputSelector)[0].files;
             let valid = true;
-            let allowedExtensions = ["pdf", "xls", "xlsx", "jpg", "jpeg", "png", "gif", "zip"];
+            let allowedExtensions = ["pdf", "jpg", "jpeg", "png", "gif", "zip"];
             let maxFileSize = 2 * 1024 * 1024; // 2MB for files, allow ZIP as well
 
             if (files.length === 0) {
@@ -92,6 +92,14 @@ mysqli_close($conn);
 
             for (let i = 0; i < files.length; i++) {
                 let fileType = files[i].name.split('.').pop().toLowerCase();
+                if (["xls", "xlsx"].includes(fileType)) {
+                    $("#uploadStatus").html('<div class="alert alert-warning">Excel files must be converted to PDF before uploading.</div>');
+                    return;
+                }
+                if (["doc", "docx"].includes(fileType)) {
+                    $("#uploadStatus").html('<div class="alert alert-warning">Word documents must be converted to PDF before uploading.</div>');
+                    return;
+                }
                 if (!allowedExtensions.includes(fileType) || files[i].size > maxFileSize) {
                     valid = false;
                     break;
@@ -99,9 +107,12 @@ mysqli_close($conn);
             }
 
             if (!valid) {
-                $("#uploadStatus").html('<div class="alert alert-danger">Invalid file! Only PDF, Excel, Image, and ZIP files under 2MB are allowed.</div>');
+                $("#uploadStatus").html('<div class="alert alert-danger">Invalid file! Only PDF, Image, and ZIP files under 2MB are allowed.</div>');
                 return;
             }
+
+            // Include CSRF token for security
+            formData.append("csrf_token", "your_csrf_token_here");
 
             $.ajax({
                 url: "upload_file.php",
@@ -154,27 +165,26 @@ mysqli_close($conn);
                 $.ajax({
                     url: "deleteFile.php",
                     type: "POST",
-                    data: { delete_id: fileId },
+                    data: { delete_id: fileId, csrf_token: "your_csrf_token_here" },
                     success: function(response) {
                         if (response.trim() === "success") {
-                            alert("File deleted successfully!");
-                            loadFileList();
+                            $("#uploadStatus").html('<div class="alert alert-success">File deleted successfully!</div>');
+                            loadFileList(); // Refresh file list without reloading
                         } else {
-                            alert("Error deleting file!");
+                            $("#uploadStatus").html('<div class="alert alert-danger">Error deleting file!</div>');
                         }
                     },
                     error: function() {
-                        alert("Error processing request.");
+                        $("#uploadStatus").html('<div class="alert alert-danger">Error processing request.</div>');
                     }
                 });
             }
         });
     }
 
+    loadFileList(); // Initial load
     attachDeleteEvents();
 });
-
-
 
     </script>
 </body>

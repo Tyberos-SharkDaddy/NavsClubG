@@ -38,13 +38,7 @@ mysqli_close($conn);
                 </form>
 
                 <!-- Folder Upload Form -->
-                <form id="folderUploadForm" enctype="multipart/form-data" class="border p-4 shadow rounded bg-light">
-                    <h5 class="text-center">Upload Folder</h5>
-                    <div class="mb-3">
-                        <input type="file" id="folderInput" name="folderFiles[]" webkitdirectory directory multiple class="form-control">
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Upload Folder</button>
-                </form>
+                
                 
                 <div id="uploadStatus"></div>
             </div>
@@ -81,15 +75,20 @@ mysqli_close($conn);
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
    $(document).ready(function() {
-    function handleUpload(form, inputSelector, uploadType) {
+    function handleUpload(form, inputSelector) {
         $(form).on("submit", function(e) {
             e.preventDefault();
 
             let formData = new FormData(this);
             let files = $(inputSelector)[0].files;
             let valid = true;
-            let allowedExtensions = uploadType === "folder" ? ["zip"] : ["pdf", "xls", "xlsx", "jpg", "jpeg", "png", "gif"];
-            let maxFileSize = uploadType === "folder" ? 50 * 1024 * 1024 : 2 * 1024 * 1024; // 50MB for ZIP, 2MB for others
+            let allowedExtensions = ["pdf", "xls", "xlsx", "jpg", "jpeg", "png", "gif", "zip"];
+            let maxFileSize = 2 * 1024 * 1024; // 2MB for files, allow ZIP as well
+
+            if (files.length === 0) {
+                $("#uploadStatus").html('<div class="alert alert-danger">No file selected!</div>');
+                return;
+            }
 
             for (let i = 0; i < files.length; i++) {
                 let fileType = files[i].name.split('.').pop().toLowerCase();
@@ -100,15 +99,12 @@ mysqli_close($conn);
             }
 
             if (!valid) {
-                let errorMessage = uploadType === "folder" ? "Invalid file! Only ZIP files under 50MB are allowed." : "Invalid file! Only PDF, Excel, and Image files under 2MB are allowed.";
-                $("#uploadStatus").html('<div class="alert alert-danger">' + errorMessage + '</div>');
+                $("#uploadStatus").html('<div class="alert alert-danger">Invalid file! Only PDF, Excel, Image, and ZIP files under 2MB are allowed.</div>');
                 return;
             }
 
-            let uploadUrl = uploadType === "file" ? "upload_file.php" : "upload_folder.php";
-
             $.ajax({
-                url: uploadUrl,
+                url: "upload_file.php",
                 type: "POST",
                 data: formData,
                 contentType: false,
@@ -137,8 +133,7 @@ mysqli_close($conn);
         });
     }
 
-    handleUpload("#fileUploadForm", "#fileInput", "file");
-    handleUpload("#folderUploadForm", "#folderInput", "folder");
+    handleUpload("#fileUploadForm", "#fileInput");
 
     function loadFileList() {
         $.ajax({
@@ -178,6 +173,9 @@ mysqli_close($conn);
 
     attachDeleteEvents();
 });
+
+
+
     </script>
 </body>
 </html>

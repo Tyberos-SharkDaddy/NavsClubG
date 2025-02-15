@@ -6,12 +6,22 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Allowed image extensions and MIME types
-$allowed_extensions = ['jpg', 'jpeg', 'png'];
-$allowed_mime_types = ['image/jpeg', 'image/png'];
+// Allowed file extensions and MIME types
+$allowed_extensions = ['zip', 'pdf', 'xlsx', 'jpg', 'jpeg', 'png', 'gif'];
+$allowed_mime_types = [
+    'application/zip',
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'image/jpeg',
+    'image/png',
+    'image/gif'
+];
 
-// Set max file size (2MB)
-$max_file_size = 2 * 1024 * 1024; // 2MB
+// Set max file size (ZIP: 50MB, Others: 2MB)
+$max_file_sizes = [
+    'zip' => 50 * 1024 * 1024, // 50MB
+    'default' => 2 * 1024 * 1024 // 2MB
+];
 
 $response = ['success' => false, 'error' => 'No file uploaded!'];
 
@@ -30,7 +40,20 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['files'])) {
             'type' => $uploadedFiles['type'][$i]
         ];
 
-        $result = handleImageUpload($file, $conn, $allowed_extensions, $allowed_mime_types, $max_file_size);
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $max_file_size = $max_file_sizes[$extension] ?? $max_file_sizes['default'];
+
+        if (!in_array($extension, $allowed_extensions)) {
+            $errors[] = "Invalid file type: $extension";
+            continue;
+        }
+
+        if ($file['size'] > $max_file_size) {
+            $errors[] = "File too large: {$file['name']} exceeds limit.";
+            continue;
+        }
+
+        $result = storeFileInDatabase($conn, $file);
         if ($result['success']) {
             $successCount++;
         } else {
@@ -39,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['files'])) {
     }
 
     if ($successCount > 0) {
-        $response = ['success' => true, 'message' => "$successCount image(s) uploaded successfully."];
+        $response = ['success' => true, 'message' => "$successCount file(s) uploaded successfully."];
     } else {
         $response = ['success' => false, 'error' => implode(", ", $errors)];
     }
@@ -49,40 +72,23 @@ mysqli_close($conn);
 echo json_encode($response);
 
 /**
- * Function to handle a single image upload.
+ * Function to store a file in the database.
  */
-function handleImageUpload($file, $conn, $allowed_extensions, $allowed_mime_types, $max_file_size) {
+function storeFileInDatabase($conn, $file) {
     $filename = $file['name'];
-    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-    $tempFile = $file['tmp_name'];
     $size = $file['size'];
-    $mime_type = mime_content_type($tempFile);
-
-    if (!in_array($extension, $allowed_extensions) || !in_array($mime_type, $allowed_mime_types)) {
-        return ['success' => false, 'error' => "Invalid file type! Only JPG, JPEG, and PNG images are allowed."];
-    }
-
-    if ($size > $max_file_size) {
-        return ['success' => false, 'error' => 'Image too large! Maximum allowed size is 2MB.'];
-    }
-
-    return storeImageInDatabase($conn, $filename, $size, $mime_type, $tempFile);
-}
-
-/**
- * Function to store an image in the database.
- */
-function storeImageInDatabase($conn, $filename, $size, $mime_type, $tempFile) {
-    $imageData = file_get_contents($tempFile); // Get image data as BLOB
-
+    $mime_type = mime_content_type($file['tmp_name']);
+    $data = file_get_contents($file['tmp_name']);
+    
     $sql = "INSERT INTO files (name, size, type, data) VALUES (?, ?, ?, ?)";
     $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "sisb", $filename, $size, $mime_type, $imageData);
+    mysqli_stmt_bind_param($stmt, "sisb", $filename, $size, $mime_type, $null);
+    mysqli_stmt_send_long_data($stmt, 3, $data);
     $result = mysqli_stmt_execute($stmt);
 
     if ($result) {
         mysqli_stmt_close($stmt);
-        return ['success' => true, 'message' => "Image '$filename' uploaded successfully."];
+        return ['success' => true, 'message' => "File '$filename' uploaded successfully."];
     } else {
         return ['success' => false, 'error' => 'Database error: ' . mysqli_error($conn)];
     }

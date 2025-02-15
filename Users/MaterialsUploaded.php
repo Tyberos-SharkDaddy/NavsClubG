@@ -52,6 +52,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+
 <script>
 $(document).ready(function() {
     $(".view-file").click(function() {
@@ -77,7 +79,20 @@ $(document).ready(function() {
                     } else if (fileExt === "pdf") {
                         previewHTML = `<iframe src="data:${response.file_type};base64,${response.file_data}" width="100%" height="500px"></iframe>`;
                     } else if (fileExt === "docx") {
-                        previewHTML = `<iframe src="https://docs.google.com/gview?url=data:${response.file_type};base64,${response.file_data}&embedded=true" width="100%" height="500px"></iframe>`;
+                        let docxDataUrl = `data:application/vnd.openxmlformats-officedocument.wordprocessingml.document;base64,${response.file_data}`;
+                        previewHTML = `<iframe src="https://docs.google.com/gview?url=${encodeURIComponent(docxDataUrl)}&embedded=true" width="100%" height="500px"></iframe>`;
+                    } else if (fileExt === "xlsx") {
+                        let binary = atob(response.file_data);
+                        let len = binary.length;
+                        let bytes = new Uint8Array(len);
+                        for (let i = 0; i < len; i++) {
+                            bytes[i] = binary.charCodeAt(i);
+                        }
+                        let workbook = XLSX.read(bytes.buffer, { type: 'array' });
+                        let sheetName = workbook.SheetNames[0];
+                        let worksheet = workbook.Sheets[sheetName];
+                        let html = XLSX.utils.sheet_to_html(worksheet);
+                        previewHTML = `<div class="table-responsive">${html}</div>`;
                     } else if (fileExt === "txt") {
                         previewHTML = `<pre>${atob(response.file_data)}</pre>`;
                     } else {
@@ -97,8 +112,6 @@ $(document).ready(function() {
         });
     });
 });
-
 </script>
-
 </body>
 </html>

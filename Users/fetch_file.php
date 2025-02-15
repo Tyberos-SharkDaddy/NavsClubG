@@ -25,15 +25,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['file_id'])) {
         mysqli_stmt_bind_result($stmt, $name, $type, $data);
         mysqli_stmt_fetch($stmt);
         
-        // Convert file data to base64 for inline display
+        $fileExt = pathinfo($name, PATHINFO_EXTENSION);
         $base64Data = base64_encode($data);
 
-        echo json_encode([
+        $response = [
             "success" => true,
             "file_name" => $name,
             "file_type" => $type,
             "file_data" => $base64Data
-        ]);
+        ];
+
+        echo json_encode($response);
     } else {
         echo json_encode(["success" => false, "error" => "File not found"]);
     }

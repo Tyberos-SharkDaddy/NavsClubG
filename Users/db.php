@@ -2,7 +2,7 @@
 $host = 'localhost'; // Database host
 $username = 'root'; // Database username
 $password = ''; // Database password
-$dbname = 'file-management'; // Database name
+$dbname = 'navsclub'; // Database name
 
 // Create connection to MySQL database
 $conn = new mysqli($host, $username, $password, $dbname);

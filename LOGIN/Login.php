@@ -27,16 +27,17 @@
             max-width: 400px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
 
         h3 {
-            text-align: center;
             margin-bottom: 15px;
         }
 
         label {
             font-weight: bold;
             display: block;
+            text-align: left;
             margin-top: 10px;
         }
 
@@ -67,6 +68,18 @@
         .btn:hover {
             background: #0056b3;
         }
+
+        .signup-link {
+            display: block;
+            margin-top: 15px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .signup-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -84,6 +97,9 @@
 
         <!-- Submit Button -->
         <button type="submit" class="btn">Login</button>
+
+        <!-- Sign-up Link -->
+        <a href="Sign-up.php" class="signup-link">Don't have an account? Sign Up</a>
     </form>
 </div>
 

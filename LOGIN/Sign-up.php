@@ -139,6 +139,8 @@
         </div>
 
         <button type="submit" class="btn">Sign Up</button>
+        <a href="Login.php" class="signup-link">have an account? Login</a>
+
     </form>
 
     <div class="message" id="message"></div>

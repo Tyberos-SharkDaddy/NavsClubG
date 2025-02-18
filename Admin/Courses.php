@@ -30,6 +30,7 @@ if ($action == 'list') {
                     <td>{$row['Audience']}</td>
                     <td>{$row['Duration']}</td>
                     <td>{$row['CourseBy']}</td>
+                    <td>{$row['Price']}</td> <!-- Added Price -->
                     <td>
                         <button class='view-btn' data-id='{$row['CourseID']}'>View</button>
                         <button class='edit-btn' data-id='{$row['CourseID']}'>Edit</button>
@@ -38,22 +39,23 @@ if ($action == 'list') {
                 </tr>";
         }
     } else {
-        echo "<tr><td colspan='8'>No records found</td></tr>";
+        echo "<tr><td colspan='9'>No records found</td></tr>"; // Adjusted colspan for Price column
     }
 }
 
 // Add a new course
 if ($action == 'add') {
-    if(isset($_POST['courseName'], $_POST['aboutCourse'], $_POST['audience'], $_POST['courseLevel'], $_POST['duration'], $_POST['courseBy'])){
+    if(isset($_POST['courseName'], $_POST['aboutCourse'], $_POST['audience'], $_POST['courseLevel'], $_POST['duration'], $_POST['courseBy'], $_POST['price'])){
         $courseName = $_POST['courseName'];
         $aboutCourse = $_POST['aboutCourse'];
         $audience = $_POST['audience'];
         $courseLevel = $_POST['courseLevel'];
         $duration = $_POST['duration'];
         $courseBy = $_POST['courseBy'];
+        $price = $_POST['price']; // Get the price
 
-        $stmt = $conn->prepare("INSERT INTO courses (CourseName, AboutCourse, Audience, CourseLevel, Duration, CourseBy) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssss", $courseName, $aboutCourse, $audience, $courseLevel, $duration, $courseBy);
+        $stmt = $conn->prepare("INSERT INTO courses (CourseName, AboutCourse, Audience, CourseLevel, Duration, CourseBy, Price) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssssd", $courseName, $aboutCourse, $audience, $courseLevel, $duration, $courseBy, $price);
 
         if ($stmt->execute()) {
             echo "success";
@@ -68,7 +70,7 @@ if ($action == 'add') {
 
 // Edit an existing course
 if ($action == 'edit') {
-    if(isset($_POST['courseID'], $_POST['courseName'], $_POST['aboutCourse'], $_POST['audience'], $_POST['courseLevel'], $_POST['duration'], $_POST['courseBy'])){
+    if(isset($_POST['courseID'], $_POST['courseName'], $_POST['aboutCourse'], $_POST['audience'], $_POST['courseLevel'], $_POST['duration'], $_POST['courseBy'], $_POST['price'])){
         $courseID = $_POST['courseID'];
         $courseName = $_POST['courseName'];
         $aboutCourse = $_POST['aboutCourse'];
@@ -76,9 +78,10 @@ if ($action == 'edit') {
         $courseLevel = $_POST['courseLevel'];
         $duration = $_POST['duration'];
         $courseBy = $_POST['courseBy'];
+        $price = $_POST['price']; // Get the price
 
-        $stmt = $conn->prepare("UPDATE courses SET CourseName=?, AboutCourse=?, Audience=?, CourseLevel=?, Duration=?, CourseBy=? WHERE CourseID=?");
-        $stmt->bind_param("ssssssi", $courseName, $aboutCourse, $audience, $courseLevel, $duration, $courseBy, $courseID);
+        $stmt = $conn->prepare("UPDATE courses SET CourseName=?, AboutCourse=?, Audience=?, CourseLevel=?, Duration=?, CourseBy=?, Price=? WHERE CourseID=?");
+        $stmt->bind_param("ssssssdi", $courseName, $aboutCourse, $audience, $courseLevel, $duration, $courseBy, $price, $courseID);
 
         if ($stmt->execute()) {
             echo "success";

@@ -73,94 +73,82 @@
             </tbody>
         </table>
     </div>
-
-    <!-- MODAL -->
-    <!-- <div class="modal" id="hoverModal">
-        <div class="modal-content">
-            <h3 id="modalTitle"></h3>
-            <p><strong>About Course:</strong> <span id="modalAbout"></span></p>
-            <p><strong>Audience:</strong> <span id="modalAudience"></span></p>
-        </div>
-    </div> -->
-
     <script>
-       $(document).ready(function() {
-            function fetchCourses() {
-                $.ajax({
-                    url: "FetchEnrollcourse.php",
-                    method: "GET",
-                    dataType: "json",
-                    success: function(response) {
-                        let rows = response.map(course => `
-                            <tr class="course-row" 
-                                data-course="${course.CourseName}" 
-                                data-about="${course.AboutCourse}" 
-                                data-audience="${course.Audience}">
-                                <td>${course.CourseName}</td>
-                                <td>${course.CourseLevel}</td>
-                                <td>${course.Duration}</td>
-                                <td>${course.CourseBy}</td>
-                                <td>${course.EnrolledCount}</td>
-                                <td>
-                                    <button class="btn-AddtoCart" data-id="${course.CourseID}">Add to Cart</button>
-                                </td>
-                            </tr>
-                        `).join("");
+     $(document).ready(function() {
+    // Function to fetch courses
+    function fetchCourses() {
+        $.ajax({
+            url: "FetchEnrollcourse.php",
+            method: "GET",
+            dataType: "json",
+            success: function(response) {
+                let rows = response.map(course => `
+                    <tr class="course-row" 
+                        data-course="${course.CourseName}" 
+                        data-about="${course.AboutCourse}" 
+                        data-audience="${course.Audience}">
+                        <td>${course.CourseName}</td>
+                        <td>${course.CourseLevel}</td>
+                        <td>${course.Duration}</td>
+                        <td>${course.CourseBy}</td>
+                        <td>${course.EnrolledCount}</td>
+                        <td>
+                            <button class="btn-AddtoCart" data-id="${course.CourseID}" data-name="${course.CourseName}">
+                                Add to Cart
+                            </button>
+                        </td>
+                    </tr>
+                `).join("");
 
-                        $("#courseTable").html(rows);
-                    }
-                });
+                $("#courseTable").html(rows);
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching courses:", status, error);
+                alert("Failed to load courses. Please try again later.");
             }
-
-            fetchCourses();
-
-            // Enroll function (redirects to shopping cart)
-            $(document).on("click", ".btn-enroll", function() {
-                let courseId = $(this).data("id");
-                window.location.href = `cart.php?course_id=${courseId}`;
-            });
-
-            // // Hover modal functionality
-            // let hideTimeout;
-
-            // $(document).on("mouseenter", ".course-row", function() {
-            //     clearTimeout(hideTimeout);
-
-            //     let $this = $(this);
-            //     $("#modalTitle").text($this.data("course"));
-            //     $("#modalAbout").text($this.data("about"));
-            //     $("#modalAudience").text($this.data("audience"));
-
-            //     let rect = this.getBoundingClientRect();
-            //     let modalWidth = $("#hoverModal").outerWidth();
-            //     let leftPos = Math.max(10, rect.left + rect.width / 2 - modalWidth / 2);
-            //     let topPos = rect.top - $("#hoverModal").outerHeight() - 10;
-
-            //     // Ensure modal doesn't go off-screen
-            //     leftPos = Math.min(window.innerWidth - modalWidth - 10, leftPos);
-            //     topPos = Math.max(10, topPos);
-
-            //     $("#hoverModal").css({
-            //         left: `${leftPos}px`,
-            //         top: `${topPos}px`,
-            //         display: "block"
-            //     });
-            // });
-
-            // $(document).on("mouseleave", ".course-row", function() {
-            //     hideTimeout = setTimeout(() => {
-            //         $("#hoverModal").fadeOut(200);
-            //     }, 200);
-            // });
-
-            // $("#hoverModal").on("mouseenter", function() {
-            //     clearTimeout(hideTimeout);
-            // }).on("mouseleave", function() {
-            //     hideTimeout = setTimeout(() => {
-            //         $("#hoverModal").fadeOut(200);
-            //     }, 200);
-            // });
         });
+    }
+
+    // Fetch courses when document is ready
+    fetchCourses();
+
+    // Add to Cart Button Click Handler
+    $(document).on("click", ".btn-AddtoCart", function() {
+        let courseId = $(this).data("id");
+        let courseName = $(this).data("name");
+
+        // Log for debugging purposes
+        console.log("Adding to cart:", courseId, courseName);
+
+        // AJAX request to add the course to the cart
+        $.ajax({
+            url: "AddtoCartCourse.php",
+            method: "POST",
+            data: { courseId: courseId },
+            dataType: "json", // Expecting JSON response
+            success: function(response) {
+                // Check the response for success
+                if (response.success) {
+                    alert(`${courseName} has been added to your cart!`);
+                    $("#cartCount").text(response.cartCount); // Update the cart count
+                    // Redirect to checkout page after a short delay
+                    setTimeout(function() {
+                        window.location.href = "CheckingoutCourses.php";
+                    }, 1000); // 1-second delay
+                } else {
+                    alert("Error adding course to cart: " + (response.error || "Unknown error"));
+                }
+            },
+            error: function(xhr, status, error) {
+                // Handle AJAX errors
+                console.error("AJAX Error:", status, error);
+                alert("AJAX Error: " + error);
+            }
+        });
+    });
+});
+
+
     </script>
 
 </body>

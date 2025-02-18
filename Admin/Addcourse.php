@@ -119,7 +119,8 @@
                 <th>Audience</th>           <!-- Target audience -->
                 <th>Course Level</th>       <!-- Level of the course (e.g., Beginner, Advanced) -->
                 <th>Duration</th>           <!-- Duration of the course (e.g., 2 hours, 4 weeks) -->
-                <th>Course By</th>          <!-- Instructor or organization offering the course -->
+                <th>Course By</th> 
+                <th>Price</th>         <!-- Instructor or organization offering the course -->
                 <th>Actions</th>            <!-- Edit/Delete actions -->
             </tr>
         </thead>

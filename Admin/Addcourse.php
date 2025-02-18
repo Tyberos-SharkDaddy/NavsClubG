@@ -119,7 +119,8 @@
                 <th>Audience</th>           <!-- Target audience -->
                 <th>Course Level</th>       <!-- Level of the course (e.g., Beginner, Advanced) -->
                 <th>Duration</th>           <!-- Duration of the course (e.g., 2 hours, 4 weeks) -->
-                <th>Course By</th>          <!-- Instructor or organization offering the course -->
+                <th>Course By</th> 
+                <th>Price</th>         <!-- Instructor or organization offering the course -->
                 <th>Actions</th>            <!-- Edit/Delete actions -->
             </tr>
         </thead>
@@ -167,7 +168,11 @@
             <!-- Instructor (Course By) -->
             <label for="courseBy">Course By:</label>
             <input type="text" id="courseBy" name="courseBy" required><br><br>
-            
+
+            <!-- Price -->
+            <label for="price">Price:</label>
+            <input type="text" id="price" name="price" required placeholder="e.g., $100"><br><br>
+
             <!-- Course Image Upload -->
             <!-- <label for="courseImage">Course Image:</label>
             <input type="file" id="courseImage" name="courseImage" accept="image/*" required><br><br>
@@ -177,23 +182,23 @@
     </div>
 </div>
 
+
 <!-- Edit Modal -->
 <div id="editModal" class="modal">
     <div class="modal-content">
         <span class="close" id="closeEdit">&times;</span>
         <h2>Edit Course</h2>
         <form id="editForm" enctype="multipart/form-data">
-            <!-- Hidden Field for Course ID -->
             <input type="hidden" id="editCourseID" name="courseID">
-
+            
             <!-- Course Name -->
             <label for="editCourseName">Course Name:</label>
             <input type="text" id="editCourseName" name="courseName" required><br><br>
-
+            
             <!-- About the Course -->
             <label for="editAboutCourse">About the Course:</label>
             <textarea id="editAboutCourse" name="aboutCourse" rows="4" required></textarea><br><br>
-
+            
             <!-- Audience -->
             <label for="editAudience">Audience:</label>
             <select id="editAudience" name="audience" required>
@@ -202,7 +207,7 @@
                 <option value="Professionals">Professionals</option>
                 <option value="Specialized Group">Specialized Group</option>
             </select><br><br>
-
+            
             <!-- Course Level -->
             <label for="editCourseLevel">Course Level:</label>
             <select id="editCourseLevel" name="courseLevel" required>
@@ -210,24 +215,24 @@
                 <option value="Intermediate">Intermediate</option>
                 <option value="Advanced">Advanced</option>
             </select><br><br>
-
+            
             <!-- Duration -->
             <label for="editDuration">Duration:</label>
             <input type="text" id="editDuration" name="duration" required placeholder="e.g., 2 weeks, 3 hours"><br><br>
-
+            
             <!-- Instructor (Course By) -->
             <label for="editCourseBy">Course By:</label>
             <input type="text" id="editCourseBy" name="courseBy" required><br><br>
 
-            <!-- Course Image Upload (Optional) -->
-            <label for="editCourseImage">Course Image (Optional):</label>
-            <input type="file" id="editCourseImage" name="courseImage" accept="image/*"><br><br>
+            <!-- Price -->
+            <label for="editPrice">Price:</label>
+            <input type="text" id="editPrice" name="price" required placeholder="e.g., $100"><br><br>
 
-            <!-- Submit Button -->
-            <input type="submit" value="Save Changes">
+            <input type="submit" value="Update Course">
         </form>
     </div>
 </div>
+
 
  <!-- Delete Modal -->
 <div id="deleteModal" class="modal">
@@ -322,6 +327,7 @@ document.addEventListener('click', function(e) {
                     document.getElementById('editCourseLevel').value = data.CourseLevel;
                     document.getElementById('editDuration').value = data.Duration;
                     document.getElementById('editCourseBy').value = data.CourseBy;
+                    document.getElementById('editPrice').value = data.Price;  // Set Price field
                     document.getElementById('editModal').style.display = 'block';
                 }
             }
@@ -329,6 +335,7 @@ document.addEventListener('click', function(e) {
         xhr.send();
     }
 });
+
 
 // Handle Edit Form Submission
 document.getElementById('editForm').onsubmit = function(e) {
@@ -397,6 +404,7 @@ document.addEventListener('click', function(e) {
                         <p><strong>Course Level:</strong> ${data.CourseLevel || 'N/A'}</p>
                         <p><strong>Duration:</strong> ${data.Duration || 'N/A'}</p>
                         <p><strong>Course By:</strong> ${data.CourseBy || 'N/A'}</p>
+                        <p><strong>Price:</strong> ${data.Price || 'N/A'}</p> <!-- Added Price -->
                     `;
                     document.getElementById('viewModal').style.display = 'block';
                 } catch (error) {
@@ -412,6 +420,7 @@ document.addEventListener('click', function(e) {
         xhr.send();
     }
 });
+
         });
     </script>
 </body>

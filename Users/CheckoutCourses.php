@@ -35,51 +35,6 @@
     </table>
 </div>
 
-<!-- Checkout Modal -->
-<div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="checkoutModalLabel">Checkout Course</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="checkoutForm">
-                    <div class="mb-3">
-                        <label class="form-label">Course Name</label>
-                        <input type="text" id="checkoutCourseName" class="form-control" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Payment Method</label>
-                        <select id="payment_method" class="form-control">
-                            <option value="Credit Card">Credit Card</option>
-                            <option value="PayPal">PayPal</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Card Number</label>
-                        <input type="text" id="card_number" class="form-control" placeholder="XXXX-XXXX-XXXX-XXXX">
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="form-label">Expiry Date</label>
-                            <input type="text" id="expiry_date" class="form-control" placeholder="MM/YY">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">CVV</label>
-                            <input type="text" id="cvv" class="form-control" placeholder="123">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" id="confirmCheckout" class="btn btn-success">Confirm Payment</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Toast Notification -->
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050">
     <div id="toastMessage" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
@@ -142,51 +97,13 @@ $(document).ready(function () {
     fetchCourses();
 
     $(document).on("click", ".checkout-btn", function () {
-        let row = $(this).closest("tr");
-        let courseId = row.data("course-id");
-        let courseName = row.find(".course-name").text().trim();
+    showToast("Proceeding to billing...", "success");
 
-        $("#checkoutCourseName").val(courseName);
-        $("#checkoutModal").modal("show");
-
-        $("#confirmCheckout").off("click").on("click", function () {
-            let payment_method = $("#payment_method").val();
-            let card_number = $("#card_number").val();
-            let expiry_date = $("#expiry_date").val();
-            let cvv = $("#cvv").val();
-
-            if (!card_number || !expiry_date || !cvv) {
-                showToast("Please fill in all payment details!", "danger");
-                return;
-            }
-
-            $.ajax({
-                url: "checkout.php",
-                method: "POST",
-                data: {
-                    courseId: courseId,
-                    courseName: courseName,
-                    payment_method: payment_method,
-                    card_number: card_number,
-                    expiry_date: expiry_date,
-                    cvv: cvv
-                },
-                dataType: "json",
-                success: function (response) {
-                    if (response.success) {
-                        showToast(response.message, "success");
-                        $("#checkoutModal").modal("hide");
-                    } else {
-                        showToast(response.message, "danger");
-                    }
-                },
-                error: function (xhr) {
-                    console.error("AJAX Error:", xhr.responseText);
-                    showToast("Error processing payment. Check console for details.", "danger");
-                }
-            });
-        });
-    });
+    // Redirect to Billing.php after a short delay
+    setTimeout(function () {
+        window.location.href = "PaymentChecking.php";
+    }, 2000); // 2-second delay
+});
 
     $(document).on("click", ".action-btn", function () {
         let action = $(this).data("action");
